@@ -53,7 +53,7 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World1"}
+    return {"message": "Hello World1234"}
 
 
 # 需求:查询功能的接口,查询图书→依赖注入:创建依赖项获取数据库会话+Depends 注入路由处理函数
@@ -77,12 +77,31 @@ async def get_database():
 
 
 @app.get("/book/books")
-async def get_book_list(db: AsyncSession = Depends(get_database)):
+async def get_books_list(db: AsyncSession = Depends(get_database)):
     # 查询
-    # result = await db.execute(select(Book))
+    # result = await db.execute(seslect(Book))
     # book = result.scalars().all() # 获取所有
     # book = result.scalars().first() # 获取第一个
-    book = db.get(Book, 1)  # 查询对应主键
+    book = await db.get(Book, 1)  # 查询对应主键
+    return book
+
+
+# 需求: 路径参数 书籍id
+@app.get("/book/get_book/{book_id}")
+async def get_book(book_id: int, db: AsyncSession = Depends(get_database)):
+    # 需求:作者以 曹 开头 %_
+    # like()模糊查询:% 任意个字符 ;_ 一个单个字符
+    # result = await db.execute(select(Book).where(Book.author.like("曹_")))
+
+    # & |~与非
+    # result = await db.execute(select(Book).where((Book.author.like("曹%"))|(Book.price>100)))
+
+    # in_() 包含
+    # 需求:书籍id列表,数据库里面的 id 如果在 书籍id列表里面 就返回
+    # id_list = [1, 3, 5, 7]
+    # result = await db.execute(select(Book).where(Book.id.in_(id_list)))
+    result = await db.execute(select(Book).where(Book.id == book_id, Book.author.like("%1%") | (Book.price >= 0)))
+    book = result.scalar_one_or_none()
     return book
 
 
