@@ -57,3 +57,6 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+#配置文件
+.env
