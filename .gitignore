@@ -34,6 +34,7 @@ env/
 # 包构建和发布产物
 dist/
 build/
+output_enhanced/
 *.egg-info/
 
 # 单元测试和覆盖率报告
